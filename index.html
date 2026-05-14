@@ -287,7 +287,102 @@ function selMonth(m,label){
   render();
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.month-wrap')){document.getElementById('mbtn').classList.remove('open');document.getElementById('mdd').classList.remove('show');}});
-function uploadCSV(e){const f=e.target.files[0];if(!f)return;alert('CSV recibido.');}
+function detectSep(line){
+  const t=(line.match(/\t/g)||[]).length;
+  const s=(line.match(/;/g)||[]).length;
+  const c=(line.match(/,/g)||[]).length;
+  if(t>=s&&t>=c)return'\t';
+  if(s>=c)return';';
+  return',';
+}
+
+function uploadCSV(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const text=ev.target.result.trim();
+    const lines=text.split('\n').filter(l=>l.trim());
+    const sep=detectSep(lines[0]);
+    const hdr=lines[0];
+    const cols=hdr.split(sep).map(c=>c.trim().replace(/^"|"$/g,'').toLowerCase());
+
+    const isOpp=cols.some(c=>c.includes('etapa')||c.includes('stage')||c.includes('oportunidad'));
+    const isVisit=cols.some(c=>c.includes('asignado')||c.includes('assigned'));
+
+    const EXCL=['AtlasAMB2B','Salva Vidal','Mayka Martin','Mireia Fernandez'];
+    function normRep(r){
+      r=r.trim().replace(/^"|"$/g,'');
+      if(r==='Roger Ochoa de Eribe')return'Roger Ochoa';
+      if(r==='Luis Enrique Rojas')return'Luis Rojas';
+      return r;
+    }
+    function getMonth(dateStr){
+      if(!dateStr)return 0;
+      dateStr=dateStr.trim().replace(/^"|"$/g,'');
+      // dd/mm/yyyy or mm/dd/yyyy — try dd/mm/yyyy first
+      const parts=dateStr.split(/[\/\-\.]/);
+      if(parts.length>=3){
+        // If first part > 12 it must be day
+        const a=parseInt(parts[0]),b=parseInt(parts[1]);
+        if(a>12)return b; // dd/mm/yyyy
+        return b; // assume dd/mm/yyyy (Spanish format)
+      }
+      return 0;
+    }
+
+    if(isOpp){
+      const repIdx=cols.findIndex(c=>c.includes('propietario'));
+      const seatsIdx=cols.findIndex(c=>c.includes('asiento'));
+      const stageIdx=cols.findIndex(c=>c.includes('etapa')||c.includes('stage'));
+      const dateIdx=cols.findIndex(c=>c.includes('fecha de creaci'));
+
+      if(repIdx===-1||stageIdx===-1){alert('CSV de Oportunidades: no se encontraron columnas esperadas.\nColumnas detectadas: '+cols.join(', '));return;}
+
+      Object.keys(SEATS).forEach(k=>{SEATS[k]={1:0,2:0,3:0,4:0,5:0,6:0};});
+      Object.keys(OPPS).forEach(k=>{OPPS[k]={1:0,2:0,3:0,4:0,5:0,6:0};});
+
+      lines.slice(1).forEach(line=>{
+        if(!line.trim())return;
+        const c=line.split(sep);
+        const rep=normRep(c[repIdx]||'');
+        const stage=(c[stageIdx]||'').trim().replace(/^"|"$/g,'');
+        const seats=parseInt((c[seatsIdx]||'').replace(/[^0-9]/g,''))||0;
+        const month=getMonth(c[dateIdx]||'');
+        if(!rep||EXCL.includes(rep))return;
+        if(!SEATS[rep])SEATS[rep]={1:0,2:0,3:0,4:0,5:0,6:0};
+        if(!OPPS[rep])OPPS[rep]={1:0,2:0,3:0,4:0,5:0,6:0};
+        if(!ALL.includes(rep))ALL.push(rep);
+        if(stage==='Contract Signed'&&month>0)SEATS[rep][month]=(SEATS[rep][month]||0)+seats;
+        if(month>0)OPPS[rep][month]=(OPPS[rep][month]||0)+1;
+      });
+      render();
+
+    } else if(isVisit){
+      const repIdx=cols.findIndex(c=>c.includes('asignado')||c.includes('assigned'));
+      const dateIdx=cols.findIndex(c=>c==='fecha'||c.includes('fecha')&&!c.includes('creaci'));
+
+      if(repIdx===-1){alert('CSV de Visitas: no se encontró columna "Asignado".\nColumnas detectadas: '+cols.join(', '));return;}
+
+      Object.keys(VISITS).forEach(k=>{VISITS[k]={1:0,2:0,3:0,4:0,5:0,6:0};});
+
+      lines.slice(1).forEach(line=>{
+        if(!line.trim())return;
+        const c=line.split(sep);
+        const rep=normRep(c[repIdx]||'');
+        const month=getMonth(c[dateIdx]||'');
+        if(!rep||EXCL.includes(rep))return;
+        if(!VISITS[rep])VISITS[rep]={1:0,2:0,3:0,4:0,5:0,6:0};
+        if(!ALL.includes(rep))ALL.push(rep);
+        if(month>0)VISITS[rep][month]=(VISITS[rep][month]||0)+1;
+      });
+      render();
+
+    } else {
+      alert('No se pudo identificar el tipo de CSV.\nColumnas detectadas: '+cols.join(', '));
+    }
+  };
+  reader.readAsText(f,'utf-8');
+}
 render();animC();window.addEventListener('resize',rsz);
 </script>
 </body>
