@@ -32,6 +32,12 @@ body{
 .mopt:hover,.mopt.active{background:rgba(201,168,76,0.1);color:#c9a84c}
 .upd-btn{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border:1px solid rgba(201,168,76,0.28);border-radius:2px;color:rgba(201,168,76,0.5);cursor:pointer;background:rgba(0,0,0,0.4)}
 .upd-btn:hover{color:#c9a84c;border-color:rgba(201,168,76,0.6)}
+.sync-status{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:6px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2)}
+.sync-dot.ok{background:#4caf50;box-shadow:0 0 6px #4caf50}
+.sync-dot.loading{background:#c9a84c;animation:pulse 1s infinite}
+.sync-dot.err{background:#e05050}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .scards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.6rem}
 .sc{border:1px solid rgba(201,168,76,0.15);border-radius:3px;padding:10px 12px;background:rgba(0,0,0,0.45);position:relative;overflow:hidden;display:flex;align-items:center;gap:10px}
 .sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#A2234D,#0053A1)}
@@ -98,7 +104,6 @@ canvas#conf{position:absolute;inset:0;pointer-events:none;z-index:2}
 <div class="page">
 
 <div class="header-bar">
-  <!-- Legends logo -->
   <svg width="155" height="44" viewBox="0 0 155 44" xmlns="http://www.w3.org/2000/svg">
     <g transform="translate(2,5)">
       <circle cx="17" cy="17" r="15.5" fill="none" stroke="white" stroke-width="2.2"/>
@@ -118,7 +123,6 @@ canvas#conf{position:absolute;inset:0;pointer-events:none;z-index:2}
     <div class="subtitle">Legends Global &amp; FC Barcelona</div>
   </div>
 
-  <!-- FC Barcelona official crest -->
   <svg xmlns="http://www.w3.org/2000/svg" height="56" viewBox="0 0 559.078 566">
     <path d="M358.605 4.713c-26.059 18.091-51.183 26.518-79.061 26.518-27.881 0-53.005-8.427-79.066-26.518L193.689 0l-6.89 4.563c-29.455 19.504-53.387 23.072-89.904 23.072-12.59 0-26.127-2.376-39.145-6.872l-8.672-2.994-5.276 7.504c-2.806 3.991-4.891 6.526-6.906 8.977-2.483 3.019-4.829 5.872-7.584 10.3L24.9 51.642l5.022 6.674c22.317 29.658 30.739 60.17 30.739 88.892 0 53.56-29.285 100.889-52.35 124.822L0 280.654l8.477 8.46c4.547 4.538 12.646 12.941 19.344 19.981l-.269 3.691-.059.672a289.05 289.05 0 0 0-.416 15.369c0 54.393 16.077 99.616 47.894 134.593 36.836 40.498 94.434 64.675 162.507 68.438 16.904 15.395 34.083 28.173 34.852 28.744l7.277 5.397 7.268-5.416c.763-.57 17.849-13.34 34.733-28.728 68.071-3.762 125.667-27.938 162.504-68.437 31.815-34.977 47.894-80.2 47.894-134.589 0-5.045-.14-10.169-.416-15.373l-.008-.121-.061-.667s-.24-3.303-.258-3.574c6.2-6.518 14.562-15.211 19.342-19.983l8.474-8.46-8.308-8.623c-23.062-23.935-52.348-71.268-52.348-124.828 0-28.72 8.42-59.231 30.734-88.886l5.021-6.671-4.407-7.091c-2.756-4.432-5.102-7.285-7.585-10.306-2.014-2.45-4.099-4.984-6.902-8.974l-5.275-7.507-8.672 2.995c-13.021 4.496-26.557 6.872-39.146 6.872-36.52 0-60.453-3.568-89.905-23.072L365.394 0l-6.789 4.713z"/>
     <path d="M279.59 550.813s-19.458-14.434-37.037-30.854c-115-4.768-210.16-69.259-202.889-205.854.43-3.604.065-3.361.689-9.51-6.594-6.977-17.505-18.36-23.267-24.11 41.25-42.805 89.384-140.716 22.573-229.5 4.393-7.063 7.573-9.405 14.111-18.705 13.354 4.611 28.203 7.54 43.123 7.54 38.313 0 64.472-3.802 96.633-25.099 25.426 17.65 52.999 28.694 86.018 28.694 33.017 0 60.588-11.044 86.012-28.694 32.16 21.296 58.319 25.099 96.635 25.099 14.916 0 29.769-2.928 43.123-7.54 6.537 9.299 9.717 11.642 14.107 18.705-66.808 88.784-18.671 186.695 22.575 229.5-5.761 5.75-16.674 17.133-23.267 24.11.621 6.148.26 5.906.689 9.51 7.271 136.595-87.893 201.084-202.886 205.854-17.58 16.421-36.942 30.854-36.942 30.854z" fill="#e2b900"/>
@@ -152,60 +156,92 @@ canvas#conf{position:absolute;inset:0;pointer-events:none;z-index:2}
       <div class="mopt" onclick="selMonth(5,'Mayo 2026')">Mayo 2026</div>
     </div>
   </div>
+  <div class="sync-status">
+    <div class="sync-dot loading" id="sdot"></div>
+    <span id="slabel">Cargando datos...</span>
+  </div>
   <button class="upd-btn" onclick="document.getElementById('fu').click()">Actualizar CSV</button>
   <input type="file" id="fu" accept=".csv" style="display:none" onchange="uploadCSV(event)">
 </div>
 
 <div class="scards" id="sum"></div>
-
 <div class="sec-title"><div class="stl"></div><div class="stt">🏆 Podio · Asientos Contract Signed</div><div class="stl r"></div></div>
 <div class="podium-section" id="psec">
   <canvas id="conf"></canvas>
   <div class="podium-wrap" id="pod"></div>
 </div>
-
 <div class="divider"></div>
 <div class="sec-title"><div class="stl"></div><div class="stt">Ranking por categoría</div><div class="stl r"></div></div>
 <div class="three-cols" id="cols"></div>
 
 </div>
 <script>
-const SEATS={
-  'Roger Ochoa':    {3:25,4:2, 5:0},
-  'Eulàlia Serrano':{3:10,4:9, 5:0},
-  'Ivette Vinaixa': {3:0, 4:8, 5:0},
-  'Ferran Baraldés':{3:3, 4:0, 5:0},
-  'Luis Rojas':     {3:0, 4:0, 5:0},
-};
-const OPPS={
-  'Roger Ochoa':    {3:22,4:28,5:2},
-  'Eulàlia Serrano':{3:56,4:47,5:3},
-  'Ivette Vinaixa': {3:2, 4:2, 5:0},
-  'Ferran Baraldés':{3:1, 4:0, 5:0},
-  'Luis Rojas':     {3:0, 4:3, 5:0},
-};
-const VISITS={
-  'Roger Ochoa':    {1:39,2:29,3:89,4:57,5:31},
-  'Eulàlia Serrano':{1:0, 2:2, 3:83,4:82,5:29},
-  'Ivette Vinaixa': {},
-  'Ferran Baraldés':{},
-  'Luis Rojas':     {},
-};
-const ALL=['Roger Ochoa','Eulàlia Serrano','Ivette Vinaixa','Ferran Baraldés','Luis Rojas'];
-const MS=[1,2,3,4,5];
+// ── JSONBin config ──────────────────────────────────────
+const BIN_ID='6a05adf4250b1311c34bd6a6';
+const API_KEY='$2a$10$2GWbFh/0BEArZZNaxLl21udaoMpF6NQudU6NzkJfgPslXetVp2hKC';
+const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+// ────────────────────────────────────────────────────────
+
+let SEATS={}, OPPS={}, VISITS={};
+let ALL=['Roger Ochoa','Eulàlia Serrano','Ivette Vinaixa','Ferran Baraldés','Luis Rojas'];
+const MS=[1,2,3,4,5,6];
 let selM='all';
+
+function setStatus(state,msg){
+  const dot=document.getElementById('sdot');
+  const lbl=document.getElementById('slabel');
+  dot.className='sync-dot '+state;
+  lbl.textContent=msg;
+}
+
+async function loadFromBin(){
+  setStatus('loading','Cargando datos...');
+  try{
+    const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
+    const j=await r.json();
+    const d=j.record;
+    SEATS=d.seats||{};OPPS=d.opps||{};VISITS=d.visits||{};
+    if(d.reps&&d.reps.length)ALL=d.reps;
+    const upd=d.updated?new Date(d.updated).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+    setStatus('ok','Actualizado: '+upd);
+    render();
+  }catch(e){
+    setStatus('err','Error al cargar datos');
+    render();
+  }
+}
+
+async function saveToBin(){
+  setStatus('loading','Guardando...');
+  try{
+    await fetch(BIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+      body:JSON.stringify({seats:SEATS,opps:OPPS,visits:VISITS,reps:ALL,updated:new Date().toISOString()})
+    });
+    const now=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    setStatus('ok','Actualizado: '+now);
+  }catch(e){
+    setStatus('err','Error al guardar');
+  }
+}
 
 function compute(month){
   const D={};
   ALL.forEach(r=>{
     const ms=month==='all'?MS:[month];
     let s=0,o=0,v=0;
-    ms.forEach(m=>{s+=(SEATS[r]&&SEATS[r][m])||0;o+=(OPPS[r]&&OPPS[r][m])||0;v+=(VISITS[r]&&VISITS[r][m])||0;});
+    ms.forEach(m=>{
+      s+=((SEATS[r]&&SEATS[r][m])||0);
+      o+=((OPPS[r]&&OPPS[r][m])||0);
+      v+=((VISITS[r]&&VISITS[r][m])||0);
+    });
     D[r]={seats:s,opp:o,visits:v};
   });
   return D;
 }
 
+// CONFETTI
 const cv=document.getElementById('conf'),cx=cv.getContext('2d');
 const CC=['#c9a84c','#fff','#A2234D','#0053A1','#f5e060','#e06080'];
 let pcs=[],confActive=false;
@@ -244,7 +280,7 @@ function render(){
     if(entry){
       const[name,d]=entry;
       ph+=`<div class="ps r${rank}"><div class="trophy-area"><div class="tglow"></div>${tFns[rank]()}</div><div class="pname">${name}</div><div class="pscore">${d.seats} asientos</div><div class="pblock"><span class="pnum">#${rank}</span><span class="plbl">${labels[rank]}</span></div></div>`;
-    } else {
+    }else{
       ph+=`<div class="ps r${rank}" style="opacity:0.15"><div class="trophy-area"></div><div class="pname">— — —</div><div class="pscore">sin datos</div><div class="pblock"><span class="pnum">#${rank}</span><span class="plbl">${labels[rank]}</span></div></div>`;
     }
   });
@@ -278,15 +314,7 @@ function render(){
     col(byVis,'visits','Visitas','🚗','#A2234D');
 }
 
-function toggleDD(){document.getElementById('mbtn').classList.toggle('open');document.getElementById('mdd').classList.toggle('show');}
-function selMonth(m,label){
-  selM=m;document.getElementById('mlabel').textContent=label;
-  document.querySelectorAll('.mopt').forEach(o=>o.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('mbtn').classList.remove('open');document.getElementById('mdd').classList.remove('show');
-  render();
-}
-document.addEventListener('click',e=>{if(!e.target.closest('.month-wrap')){document.getElementById('mbtn').classList.remove('open');document.getElementById('mdd').classList.remove('show');}});
+// ── CSV Upload ──────────────────────────────────────────
 function detectSep(line){
   const t=(line.match(/\t/g)||[]).length;
   const s=(line.match(/;/g)||[]).length;
@@ -299,19 +327,18 @@ function detectSep(line){
 function uploadCSV(e){
   const f=e.target.files[0];if(!f)return;
   const reader=new FileReader();
-  reader.onload=ev=>{
+  reader.onload=async ev=>{
     const text=ev.target.result.trim();
     const lines=text.split('\n').filter(l=>l.trim());
     const sep=detectSep(lines[0]);
-    const hdr=lines[0];
-    const cols=hdr.split(sep).map(c=>c.trim().replace(/^"|"$/g,'').toLowerCase());
+    const cols=lines[0].split(sep).map(c=>c.trim().replace(/^"|"$/g,'').toLowerCase());
 
-    const isOpp=cols.some(c=>c.includes('etapa')||c.includes('stage')||c.includes('oportunidad'));
+    const isOpp=cols.some(c=>c.includes('etapa')||c.includes('oportunidad'));
     const isVisit=cols.some(c=>c.includes('asignado')||c.includes('assigned'));
 
     const EXCL=['AtlasAMB2B','Salva Vidal','Mayka Martin','Mireia Fernandez'];
     function normRep(r){
-      r=r.trim().replace(/^"|"$/g,'');
+      r=(r||'').trim().replace(/^"|"$/g,'');
       if(r==='Roger Ochoa de Eribe')return'Roger Ochoa';
       if(r==='Luis Enrique Rojas')return'Luis Rojas';
       return r;
@@ -319,14 +346,8 @@ function uploadCSV(e){
     function getMonth(dateStr){
       if(!dateStr)return 0;
       dateStr=dateStr.trim().replace(/^"|"$/g,'');
-      // dd/mm/yyyy or mm/dd/yyyy — try dd/mm/yyyy first
       const parts=dateStr.split(/[\/\-\.]/);
-      if(parts.length>=3){
-        // If first part > 12 it must be day
-        const a=parseInt(parts[0]),b=parseInt(parts[1]);
-        if(a>12)return b; // dd/mm/yyyy
-        return b; // assume dd/mm/yyyy (Spanish format)
-      }
+      if(parts.length>=3){const a=parseInt(parts[0]);if(a>12)return parseInt(parts[1]);return parseInt(parts[1]);}
       return 0;
     }
 
@@ -335,55 +356,64 @@ function uploadCSV(e){
       const seatsIdx=cols.findIndex(c=>c.includes('asiento'));
       const stageIdx=cols.findIndex(c=>c.includes('etapa')||c.includes('stage'));
       const dateIdx=cols.findIndex(c=>c.includes('fecha de creaci'));
-
-      if(repIdx===-1||stageIdx===-1){alert('CSV de Oportunidades: no se encontraron columnas esperadas.\nColumnas detectadas: '+cols.join(', '));return;}
-
-      Object.keys(SEATS).forEach(k=>{SEATS[k]={1:0,2:0,3:0,4:0,5:0,6:0};});
-      Object.keys(OPPS).forEach(k=>{OPPS[k]={1:0,2:0,3:0,4:0,5:0,6:0};});
-
+      if(repIdx===-1||stageIdx===-1){alert('Columnas no encontradas: '+cols.join(', '));return;}
+      SEATS={};OPPS={};
       lines.slice(1).forEach(line=>{
         if(!line.trim())return;
         const c=line.split(sep);
-        const rep=normRep(c[repIdx]||'');
+        const rep=normRep(c[repIdx]);
         const stage=(c[stageIdx]||'').trim().replace(/^"|"$/g,'');
         const seats=parseInt((c[seatsIdx]||'').replace(/[^0-9]/g,''))||0;
         const month=getMonth(c[dateIdx]||'');
         if(!rep||EXCL.includes(rep))return;
-        if(!SEATS[rep])SEATS[rep]={1:0,2:0,3:0,4:0,5:0,6:0};
-        if(!OPPS[rep])OPPS[rep]={1:0,2:0,3:0,4:0,5:0,6:0};
+        if(!SEATS[rep])SEATS[rep]={};
+        if(!OPPS[rep])OPPS[rep]={};
         if(!ALL.includes(rep))ALL.push(rep);
         if(stage==='Contract Signed'&&month>0)SEATS[rep][month]=(SEATS[rep][month]||0)+seats;
         if(month>0)OPPS[rep][month]=(OPPS[rep][month]||0)+1;
       });
+      await saveToBin();
       render();
 
-    } else if(isVisit){
+    }else if(isVisit){
       const repIdx=cols.findIndex(c=>c.includes('asignado')||c.includes('assigned'));
-      const dateIdx=cols.findIndex(c=>c==='fecha'||c.includes('fecha')&&!c.includes('creaci'));
-
-      if(repIdx===-1){alert('CSV de Visitas: no se encontró columna "Asignado".\nColumnas detectadas: '+cols.join(', '));return;}
-
-      Object.keys(VISITS).forEach(k=>{VISITS[k]={1:0,2:0,3:0,4:0,5:0,6:0};});
-
+      const dateIdx=cols.findIndex(c=>c==='fecha'||(c.includes('fecha')&&!c.includes('creaci')));
+      if(repIdx===-1){alert('Columna "Asignado" no encontrada: '+cols.join(', '));return;}
+      VISITS={};
       lines.slice(1).forEach(line=>{
         if(!line.trim())return;
         const c=line.split(sep);
-        const rep=normRep(c[repIdx]||'');
+        const rep=normRep(c[repIdx]);
         const month=getMonth(c[dateIdx]||'');
         if(!rep||EXCL.includes(rep))return;
-        if(!VISITS[rep])VISITS[rep]={1:0,2:0,3:0,4:0,5:0,6:0};
+        if(!VISITS[rep])VISITS[rep]={};
         if(!ALL.includes(rep))ALL.push(rep);
         if(month>0)VISITS[rep][month]=(VISITS[rep][month]||0)+1;
       });
+      await saveToBin();
       render();
 
-    } else {
-      alert('No se pudo identificar el tipo de CSV.\nColumnas detectadas: '+cols.join(', '));
+    }else{
+      alert('No se pudo identificar el CSV.\nColumnas: '+cols.join(', '));
     }
   };
   reader.readAsText(f,'utf-8');
 }
-render();animC();window.addEventListener('resize',rsz);
+
+function toggleDD(){document.getElementById('mbtn').classList.toggle('open');document.getElementById('mdd').classList.toggle('show');}
+function selMonth(m,label){
+  selM=m;document.getElementById('mlabel').textContent=label;
+  document.querySelectorAll('.mopt').forEach(o=>o.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('mbtn').classList.remove('open');document.getElementById('mdd').classList.remove('show');
+  render();
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.month-wrap')){document.getElementById('mbtn').classList.remove('open');document.getElementById('mdd').classList.remove('show');}});
+
+// Init
+loadFromBin();
+animC();
+window.addEventListener('resize',rsz);
 </script>
 </body>
 </html>
