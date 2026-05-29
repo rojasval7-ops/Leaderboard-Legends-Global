@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Domine&display=swap');
@@ -108,6 +109,65 @@ canvas#conf{position:absolute;inset:0;pointer-events:none;z-index:2}
 
 .empty-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;background:rgba(0,0,0,.6)}
 @keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+
+/* ── MOBILE ─────────────────────────────────────────────────────── */
+@media(max-width:600px){
+  /* desactiva el scale, layout nativo scrolleable */
+  html,body{height:auto;overflow:auto}
+  .scale-root{position:static!important;transform:none!important;width:100%!important;height:auto!important;left:auto!important;top:auto!important}
+  .page{height:auto;padding:.75rem}
+
+  /* header mobile: logos arriba centrados, título debajo */
+  .header-bar{flex-direction:column;align-items:center;gap:10px;padding:12px 14px;margin-bottom:.6rem}
+  .header-logos-left{justify-content:center;gap:14px}
+  .logo-barca{height:44px}
+  .logo-legends{height:34px}
+  .header-divider{width:1px;height:42px}
+  .header-center{padding:0;text-align:center}
+  .eyebrow{font-size:8px}
+  .maintitle{font-size:16px}
+  .subtitle{font-size:8px}
+
+  /* controls: apila en columna compacta */
+  .controls{flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:.6rem}
+  .upd-btn,.month-btn{font-size:11px;padding:7px 14px}
+
+  /* summary cards: 2 columnas */
+  .scards{grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:.6rem}
+  .sc-val{font-size:18px}
+  .sc-lbl{font-size:7px}
+
+  /* layout: columna única */
+  .main-layout{grid-template-columns:1fr;gap:10px}
+  .left-col{min-height:0}
+
+  /* podio mobile: altura reducida proporcionalmente */
+  .podium-section{min-height:260px}
+  .pbar:nth-child(1) .pbar-col{height:180px}
+  .pbar:nth-child(2) .pbar-col{height:148px}
+  .pbar:nth-child(3) .pbar-col{height:118px}
+  .pbar:nth-child(4) .pbar-col{height:90px}
+  .pbar:nth-child(5) .pbar-col{height:65px}
+  .pbar:nth-child(6) .pbar-col{height:42px}
+  .pbar-rank{font-size:20px}
+  .pbar-name{font-size:8px}
+  .pbar-score{font-size:7px}
+  .pbar-lbl{font-size:6px;letter-spacing:1px}
+
+  /* ranking: columna única, scroll permitido */
+  .right-col{overflow:visible;gap:8px}
+  .col-hdr{padding:8px 12px}
+  .cht{font-size:11px}
+  .chi{font-size:15px}
+  .col-body{padding:4px 10px}
+  .crow{padding:5px 0}
+  .crn{font-size:12px}
+  .crv{font-size:16px}
+  .crk{font-size:12px}
+
+  /* sec-title */
+  .stt{font-size:9px}
+}
 </style>
 </head>
 <body>
@@ -363,16 +423,22 @@ document.addEventListener('click',e=>{if(!e.target.closest('.month-wrap')){docum
    para que nunca haya scroll. En pantallas más grandes no se amplía
    (escala máxima = 1).
 ──────────────────────────────────────────────────────────────────*/
-const DESIGN_W=1440; // ancho de referencia en px
-const DESIGN_H=820;  // alto de referencia en px
+const DESIGN_W=1440;
+const DESIGN_H=820;
+function isMobile(){return window.innerWidth<=600;}
 function applyScale(){
+  const el=document.getElementById('scaleRoot');
+  if(isMobile()){
+    // en móvil quitamos todo el scale, el CSS media query se encarga
+    el.style.cssText='';
+    return;
+  }
   const vw=window.innerWidth,vh=window.innerHeight;
   const s=Math.min(1,vw/DESIGN_W,vh/DESIGN_H);
-  const el=document.getElementById('scaleRoot');
+  el.style.position='absolute';
   el.style.width=DESIGN_W+'px';
   el.style.height=DESIGN_H+'px';
   el.style.transform=`scale(${s})`;
-  // centra horizontalmente si hay espacio sobrante
   el.style.left=Math.max(0,(vw-DESIGN_W*s)/2)+'px';
   el.style.top=Math.max(0,(vh-DESIGN_H*s)/2)+'px';
 }
